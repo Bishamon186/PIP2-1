@@ -38,16 +38,18 @@ public class AreaCheckServlet extends Dispatcher {
         y = Double.parseDouble(request.getParameter("y"));
         r = Double.parseDouble(request.getParameter("r"));
         if (x>= -3 && x <= 3 &&
-                (y == -4 || y == -3 || y == -2 || y == -1 || 
-                y == 0 || y == 1 || y == 2 || y == 3 || y == 4) &&
-                (r == 1 || r == 1.5 || r == 2 || r == 2.5 || r == 3) ){
-        	
-        	strike = checkArea(x, y, r);
-        	request.setAttribute("showResult", true);
-        	request.setAttribute("strike", strike);
-        	super.redirectTo("/index.jsp", request, response);
+                (y >= -4  && y <= 4) &&
+                (r == 1 || r == 1.5 || r == 2 || r == 2.5 || r == 3)){
+            strike = checkArea(x, y, r);
+            request.setAttribute("showResult", true);
+            request.setAttribute("strike", strike);
         }
-        else out.write("Incorrect data");
+        else {
+            request.setAttribute("showResult", false);
+            request.setAttribute("isDataCorrect", false);
+            request.setAttribute("strike", false);
+        }
+        super.redirectTo("/index.jsp", request, response);
     }
 
 }

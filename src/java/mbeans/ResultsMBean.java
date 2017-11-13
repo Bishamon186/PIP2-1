@@ -1,11 +1,12 @@
 package mbeans;
 
+import java.util.ArrayList;
+
 public interface ResultsMBean {
-	public double getX();
-	public double getY();
-	public double getR();
-	public boolean getStrike();
-	public int getSize();
+	public ArrayList getX();
+	public ArrayList getY();
+	public ArrayList getR();
+	public ArrayList getStrikes();
 	public void setX (double x);
 	public void setY (double y);
 	public void setR (double r);
