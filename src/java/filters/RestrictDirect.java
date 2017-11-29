@@ -10,17 +10,16 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.annotation.WebFilter;
 
-
-@WebFilter("/RestrictDirect")
 public class RestrictDirect implements Filter {
 
 
+        @Override
 	public void destroy() {
 		
 	}
 	
+        @Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		String referer = "";
 		HttpServletResponse resp = (HttpServletResponse) response;
@@ -50,6 +49,7 @@ public class RestrictDirect implements Filter {
 	/**
 	 * @see Filter#init(FilterConfig)
 	 */
+        @Override
 	public void init(FilterConfig fConfig) throws ServletException {
 		// TODO Auto-generated method stub
 	}

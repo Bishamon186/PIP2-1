@@ -21,7 +21,15 @@
                 border: 1px solid black;
             }
             table {
-                max-width: 80%;
+                width: 400px;
+                table-layout: fixed;
+            }
+            td, .coords{
+                overflow-x: scroll;
+                max-width:30%;
+            }
+            body{
+                max-width: 100%;
             }
         </style>
         <script type="text/javascript">
@@ -86,12 +94,12 @@
                         ctx.strokeText((2*i - 300)/60, i, 140);
                     }
                     canvas.addEventListener('click',function(evt){
-                        var x = (evt.clientX - canvas.offsetLeft - 150)/30;
-                        var y = (150 - evt.clientY + canvas.offsetTop )/30;
+                        var x = (evt.pageX - canvas.offsetLeft - 150)/30;
+                        var y = (150 - evt.pageY + canvas.offsetTop )/30;
                         if (getNumberOfChecked() == 1){
                             var r = getRadiusValue();
                             var params = "?x=" + x + "&y=" + y + "&r=" + r;
-                            window.location.replace("/Lab2/app/controllerServlet" + params);
+                            window.location.replace("<%=request.getContextPath()%>/app/controllerServlet" + params);
                         }
                         },false);
                     return ctx;
@@ -119,7 +127,7 @@
                     return ctx;
                 }
             }
-            function drawPoint(x, y, r){
+            function drawAreaWithPoint(x, y, r, point){
                 var ctx = document.getElementById("canv").getContext('2d');
                 if (ctx){
                     ctx.beginPath();
@@ -135,14 +143,12 @@
                     ctx.arc(150,150, r*30, 0, 3*Math.PI/2, true);
                     ctx.fill();
                     ctx.closePath();
-                    ctx.beginPath();
-                    ctx.moveTo(x*30 + 150, 150 - 30*y);
-                    ctx.arc(x*30 + 150, 150 - 30*y, 1, 0, 2* Math.PI, false);
-                    ctx.fillStyle = 'red';
-                    ctx.fill();
-                    ctx.closePath();
+                    point(x,y,ctx);
                     return ctx;
                 }
+            }
+            function makePoint(x,y,ctx){
+                
             }
         </script>
     </head>
@@ -154,7 +160,7 @@
             drawDefault();
         </script>
         <br>
-        <form action = "/Lab2/app/controllerServlet" method="GET" id = "myForm" onsubmit="return validate(this);">
+        <form action = "<%=request.getContextPath()%>/app/controllerServlet" method="GET" id = "myForm" onsubmit="return validate(this);">
             Введите x: <input type="text" name = "x"><br>
             Введите y: <br>
             <select name = "y" form ="myForm">
@@ -184,7 +190,10 @@
 		    Double x = Double.parseDouble(request.getParameter("x"));
 		    Double y = Double.parseDouble(request.getParameter("y"));
 		    Double r = Double.parseDouble(request.getParameter("r"));
-		    out.write("Координаты: (" + x + "; " + y + "), радиус: " + r + "<br>");
+                    out.write ("<div class = \"coords\">");
+		    out.write("Координаты: (" + request.getParameter("x") + "; " + request.getParameter("y") + "), радиус: "
+                            + request.getParameter("r") + "<br>");
+                    out.write("</div>");
 		    if (strike) {
 		        out.write("Точка попадает в область. <br>");
 		    }
@@ -192,7 +201,15 @@
         %>
         <jsp:useBean id="resultsBean" class="mbeans.Results" scope="session"/>
         <script type="text/javascript">
-            drawPoint(parseFloat(<%= x%>), parseFloat(<%= y%>), parseFloat(<%= r%>));
+            drawAreaWithPoint(parseFloat(<%= x%>), parseFloat(<%= y%>), parseFloat(<%= r%>), 
+                function (x,y,ctx){
+                ctx.beginPath();
+                ctx.moveTo(x*30 + 150, 150 - 30*y);
+                ctx.arc(x*30 + 150, 150 - 30*y, 1, 0, 2* Math.PI, false);
+                ctx.fillStyle = 'red';
+                ctx.fill();
+                ctx.closePath();
+                });
         </script>
         <%
                     resultsBean.setStrike(strike);
@@ -214,13 +231,16 @@
                     for (int i = 0; i < size; i++){
                         out.write("<tr>");
                         out.write("<td>");
-                        out.print(xResults.get(i));
+                        //out.print(xResults.get(i));
+                        out.print(request.getParameter("x"));
                         out.write("</td>");
                         out.write("<td>");
-                        out.print(yResults.get(i));
+                        //out.print(yResults.get(i));
+                        out.print(request.getParameter("y"));
                         out.write("</td>");
                         out.write("<td>");
-                        out.print(rResults.get(i));
+                        //out.print(rResults.get(i));
+                        out.print(request.getParameter("r"));
                         out.write("</td>");
                         out.write("<td>");
                         if (strikesResults.get(i))
@@ -231,6 +251,7 @@
                     }
                     out.write("</table>");
 		    out.write("<a href = ../index.jsp>Убрать результаты</a>");
+                    System.out.println("qwer");
 		}
                 else if (request.getAttribute("isDataCorrect")!=null)
                     if (!((Boolean) request.getAttribute("isDataCorrect")).booleanValue())
